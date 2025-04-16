@@ -22,11 +22,21 @@ const UseCaseCard = ({
   bgColor = "bg-white",
   index
 }: UseCaseCardProps) => {
+  // Define animation variants outside the return statement
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.3, delay: index * 0.1 }
+    }
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
+      initial="hidden"
+      animate="visible"
+      variants={cardVariants}
       className={cn(
         "rounded-lg shadow-md hover:shadow-lg transition-all duration-200",
         "transform hover:-translate-y-1",
