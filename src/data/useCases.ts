@@ -1,7 +1,7 @@
-
 import { 
   Bot, 
   BrainCircuit, 
+  Mail, 
   MessageSquare, 
   NetworkIcon
 } from 'lucide-react';
@@ -27,7 +27,7 @@ export const useCases: UseCase[] = [
     title: 'Mail Classification',
     description: 'Automates the sorting and ticket creation process by classifying multi-issue emails using an ML model and generating tickets via API',
     path: '/mail-classification',
-    icon: BrainCircuit
+    icon: Mail
   },
   {
     id: 'sop-chatbot',
