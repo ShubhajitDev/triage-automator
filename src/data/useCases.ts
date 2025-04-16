@@ -1,9 +1,9 @@
 
 import { 
-  Ticket, 
-  Mail, 
+  Bot, 
+  BrainCircuit, 
   MessageSquare, 
-  AlertTriangle
+  NetworkIcon
 } from 'lucide-react';
 
 export interface UseCase {
@@ -20,14 +20,14 @@ export const useCases: UseCase[] = [
     title: 'Ticket Triage',
     description: 'Uses ML model trained in historical ticket data to suggest the correct assignment group, priority and impact reducing manual effort',
     path: '/ticket-triage',
-    icon: Ticket
+    icon: Bot
   },
   {
     id: 'mail-classification',
     title: 'Mail Classification',
     description: 'Automates the sorting and ticket creation process by classifying multi-issue emails using an ML model and generating tickets via API',
     path: '/mail-classification',
-    icon: Mail
+    icon: BrainCircuit
   },
   {
     id: 'sop-chatbot',
@@ -41,6 +41,6 @@ export const useCases: UseCase[] = [
     title: 'Anomaly Detection',
     description: 'Detects system anomalies using ML and auto-generates RCA reports to accelerate incidents analysis and response',
     path: '/anomaly-detection',
-    icon: AlertTriangle
+    icon: NetworkIcon
   }
 ];
