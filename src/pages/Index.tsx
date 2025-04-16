@@ -11,8 +11,8 @@ const Index = () => {
       
       <main className="flex-1 container mx-auto py-8 px-4">
         <section className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Welcome to Triage Automator</h2>
-          <p className="text-gray-600">Select a triage use case below to get started</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">AIOps Usecases</h2>
+          <p className="text-gray-600">Select an AIOps use case to get started</p>
         </section>
         
         <section>
@@ -33,7 +33,7 @@ const Index = () => {
       
       <footer className="bg-white py-6 border-t border-gray-200">
         <div className="container mx-auto px-4">
-          <p className="text-center text-gray-600">© {new Date().getFullYear()} Triage Automator. All rights reserved.</p>
+          <p className="text-center text-gray-600">© {new Date().getFullYear()} AIOps Usecases. All rights reserved.</p>
         </div>
       </footer>
     </div>
