@@ -2,7 +2,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { LucideIcon } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface UseCaseCardProps {
@@ -22,26 +21,16 @@ const UseCaseCard = ({
   bgColor = "bg-white",
   index
 }: UseCaseCardProps) => {
-  // Define animation variants outside the return statement
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.3, delay: index * 0.1 }
-    }
-  };
-
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={cardVariants}
+    <div
       className={cn(
         "rounded-lg shadow-md hover:shadow-lg transition-all duration-200",
-        "transform hover:-translate-y-1",
+        "transform hover:-translate-y-1 opacity-0",
         bgColor
       )}
+      style={{
+        animation: `fadeIn 0.5s ease-out ${index * 0.1}s forwards`
+      }}
     >
       <Link to={path} className="block p-6">
         <div className="flex flex-col items-center text-center">
@@ -52,7 +41,20 @@ const UseCaseCard = ({
           <p className="text-gray-600">{description}</p>
         </div>
       </Link>
-    </motion.div>
+      
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+    </div>
   );
 };
 
