@@ -41,19 +41,6 @@ const UseCaseCard = ({
           <p className="text-gray-600">{description}</p>
         </div>
       </Link>
-      
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };
