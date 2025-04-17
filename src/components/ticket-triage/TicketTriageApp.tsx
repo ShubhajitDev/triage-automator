@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TicketsDashboard from './TicketsDashboard';
@@ -7,7 +6,9 @@ import { mockTickets, Ticket, TicketChange, assignmentGroups, userNames } from '
 import { useToast } from '@/hooks/use-toast';
 
 const TicketTriageApp: React.FC = () => {
-  const [tickets, setTickets] = useState<Ticket[]>(mockTickets);
+  // Filter only open tickets
+  const openTickets = mockTickets.filter(ticket => ticket.status === "Open" || ticket.status === "In Progress");
+  const [tickets, setTickets] = useState<Ticket[]>(openTickets);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const { toast } = useToast();
 
@@ -153,26 +154,10 @@ const TicketTriageApp: React.FC = () => {
       <Tabs defaultValue="dashboard">
         <TabsList className="mb-4">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="tickets">Tickets</TabsTrigger>
         </TabsList>
         
         <TabsContent value="dashboard" className="space-y-6">
           <TicketsDashboard tickets={tickets} />
-        </TabsContent>
-        
-        <TabsContent value="tickets">
-          <TicketsList 
-            tickets={tickets}
-            assignmentGroups={assignmentGroups}
-            userNames={userNames}
-            onValidate={handleTicketValidation}
-            onReassign={handleTicketReassignment}
-            onPrioritize={handleTicketPrioritization}
-            onUpdateDescription={handleDescriptionUpdate}
-            onUpdateAssignee={handleAssignedToUpdate}
-            selectedTicket={selectedTicket}
-            setSelectedTicket={setSelectedTicket}
-          />
         </TabsContent>
       </Tabs>
     </div>

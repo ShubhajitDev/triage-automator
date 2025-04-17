@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Card, 
@@ -72,23 +71,6 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
     accuracy: Math.round(accuracy * 100)
   }));
 
-  // For confidence analysis
-  const confidenceDistribution = [
-    { range: '0-20%', count: stats.confidenceBuckets[0] },
-    { range: '21-40%', count: stats.confidenceBuckets[1] },
-    { range: '41-60%', count: stats.confidenceBuckets[2] },
-    { range: '61-80%', count: stats.confidenceBuckets[3] },
-    { range: '81-100%', count: stats.confidenceBuckets[4] },
-  ];
-
-  const confidenceVsAccuracyData = [
-    { confidence: 10, accuracy: 5, count: stats.confidenceBuckets[0] },
-    { confidence: 30, accuracy: 20, count: stats.confidenceBuckets[1] },
-    { confidence: 50, accuracy: 45, count: stats.confidenceBuckets[2] },
-    { confidence: 70, accuracy: 65, count: stats.confidenceBuckets[3] },
-    { confidence: 90, accuracy: 85, count: stats.confidenceBuckets[4] },
-  ];
-
   const toggleTicketDetails = (ticketId: string) => {
     if (expandedTicket === ticketId) {
       setExpandedTicket(null);
@@ -101,11 +83,10 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
     <div className="space-y-6">
       {/* Dashboard Navigation */}
       <Tabs defaultValue="summary" value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 w-full">
+        <TabsList className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 w-full">
           <TabsTrigger value="summary">Summary</TabsTrigger>
           <TabsTrigger value="fields">Field Analysis</TabsTrigger>
           <TabsTrigger value="comparisons">Before vs After</TabsTrigger>
-          <TabsTrigger value="confidence">Confidence</TabsTrigger>
           <TabsTrigger value="drilldown">Drill Down</TabsTrigger>
           <TabsTrigger value="samples">Sample Cases</TabsTrigger>
         </TabsList>
@@ -114,17 +95,17 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
         <TabsContent value="summary" className="w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             {/* KPI Cards */}
-            <Card>
+            <Card className="h-full">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base font-medium">Total Tickets</CardTitle>
+                <CardTitle className="text-base font-medium">Total Open Tickets</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{totalTickets}</div>
-                <p className="text-xs text-muted-foreground mt-1">Historical tickets processed</p>
+                <div className="text-3xl font-bold">{tickets.length}</div>
+                <p className="text-xs text-muted-foreground mt-1">Open tickets being processed</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="h-full">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-medium">Auto-Update Rate</CardTitle>
               </CardHeader>
@@ -134,7 +115,7 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="h-full">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-medium">Suggestion Accuracy</CardTitle>
               </CardHeader>
@@ -144,7 +125,7 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="h-full">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-medium">Estimated Time Saved</CardTitle>
               </CardHeader>
@@ -412,89 +393,6 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        {/* 4. Model Confidence Analysis Tab */}
-        <TabsContent value="confidence" className="w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Confidence Score Distribution</CardTitle>
-                <CardDescription>How confident the model was across predictions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="w-full h-[280px]">
-                  <ChartContainer config={{ confidence: {} }} className="h-full w-full">
-                    <BarChart
-                      data={confidenceDistribution}
-                      margin={{
-                        top: 5,
-                        right: 10,
-                        left: 0,
-                        bottom: 30,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="range" 
-                        tick={{ fontSize: 12 }}
-                      />
-                      <YAxis 
-                        width={30} 
-                        tick={{ fontSize: 10 }} 
-                        label={{ value: 'Count', angle: -90, position: 'insideLeft' }}
-                      />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="count" fill="#D946EF" name="Number of Predictions" />
-                    </BarChart>
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Confidence vs Accuracy</CardTitle>
-                <CardDescription>Relationship between model confidence and correctness</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="w-full h-[280px]">
-                  <ChartContainer config={{ confidenceVsAccuracy: {} }} className="h-full w-full">
-                    <ScatterChart
-                      margin={{
-                        top: 20,
-                        right: 20,
-                        bottom: 30,
-                        left: 20,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        type="number" 
-                        dataKey="confidence" 
-                        name="Confidence" 
-                        domain={[0, 100]} 
-                        label={{ value: 'Confidence %', position: 'bottom' }}
-                        tick={{ fontSize: 11 }}
-                      />
-                      <YAxis 
-                        type="number" 
-                        dataKey="accuracy" 
-                        name="Accuracy" 
-                        domain={[0, 100]} 
-                        label={{ value: 'Accuracy %', angle: -90, position: 'insideLeft' }}
-                        tick={{ fontSize: 11 }}
-                        width={40}
-                      />
-                      <ZAxis type="number" dataKey="count" range={[50, 400]} />
-                      <ChartTooltip content={<ChartTooltipContent />} cursor={{ strokeDasharray: '3 3' }} />
-                      <Scatter name="Confidence/Accuracy" data={confidenceVsAccuracyData} fill="#8884d8" />
-                    </ScatterChart>
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
 
         {/* 5. Filter & Drilldown Tab */}
