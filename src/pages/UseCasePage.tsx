@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useCases } from '@/data/useCases';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import TicketTriageApp from '@/components/ticket-triage/TicketTriageApp';
 
 const UseCasePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -45,10 +46,14 @@ const UseCasePage = () => {
           
           <p className="text-gray-600 text-lg mb-8">{useCase.description}</p>
           
-          <div className="p-8 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-center text-gray-500">This is a placeholder for the {useCase.title.toLowerCase()} functionality.</p>
-            <p className="text-center text-gray-500">Implementation coming soon!</p>
-          </div>
+          {useCase.id === 'ticket-triage' && <TicketTriageApp />}
+          
+          {useCase.id !== 'ticket-triage' && (
+            <div className="p-8 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-center text-gray-500">This is a placeholder for the {useCase.title.toLowerCase()} functionality.</p>
+              <p className="text-center text-gray-500">Implementation coming soon!</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
