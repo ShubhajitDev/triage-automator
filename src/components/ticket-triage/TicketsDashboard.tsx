@@ -4,7 +4,6 @@ import {
   Card, 
   CardContent, 
   CardDescription, 
-  CardFooter, 
   CardHeader, 
   CardTitle 
 } from "@/components/ui/card";
@@ -17,7 +16,6 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
@@ -80,15 +78,15 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
       </Card>
 
       {/* Priority Distribution */}
-      <Card>
+      <Card className="h-full">
         <CardHeader>
           <CardTitle>Tickets by Priority</CardTitle>
           <CardDescription>Distribution of tickets by priority level</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <ChartContainer config={{ priority: {} }} className="h-full">
-              <PieChart>
+        <CardContent className="flex justify-center items-center">
+          <div className="w-full h-[280px]">
+            <ChartContainer config={{ priority: {} }} className="h-full w-full">
+              <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                 <Pie
                   data={priorityData}
                   cx="50%"
@@ -111,26 +109,32 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
       </Card>
 
       {/* Field Changes */}
-      <Card>
+      <Card className="h-full">
         <CardHeader>
           <CardTitle>Changes by Field</CardTitle>
           <CardDescription>Number of updates by field type</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
-            <ChartContainer config={{ field: {} }} className="h-full">
+          <div className="w-full h-[280px]">
+            <ChartContainer config={{ field: {} }} className="h-full w-full">
               <BarChart
                 data={fieldChangeData}
                 margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 45,
+                  top: 5,
+                  right: 10,
+                  left: 0,
+                  bottom: 40,
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" angle={-45} textAnchor="end" />
-                <YAxis />
+                <XAxis 
+                  dataKey="name" 
+                  angle={-45} 
+                  textAnchor="end"
+                  height={60}
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis width={30} tick={{ fontSize: 10 }} />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="count" fill="#9b87f5" name="Changes" />
               </BarChart>
@@ -140,32 +144,38 @@ const TicketsDashboard: React.FC<TicketsDashboardProps> = ({ tickets }) => {
       </Card>
 
       {/* Changes Over Time */}
-      <Card>
+      <Card className="h-full">
         <CardHeader>
           <CardTitle>Changes Over Time</CardTitle>
           <CardDescription>Ticket updates over the past 7 days</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
-            <ChartContainer config={{ time: {} }} className="h-full">
+          <div className="w-full h-[280px]">
+            <ChartContainer config={{ time: {} }} className="h-full w-full">
               <LineChart
                 data={stats.changesByDay}
                 margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 45,
+                  top: 5,
+                  right: 10,
+                  left: 0,
+                  bottom: 40,
                 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" angle={-45} textAnchor="end" />
-                <YAxis />
+                <XAxis 
+                  dataKey="date" 
+                  angle={-45} 
+                  textAnchor="end" 
+                  height={60}
+                  tick={{ fontSize: 10 }}
+                />
+                <YAxis width={30} tick={{ fontSize: 10 }} />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Line 
                   type="monotone" 
                   dataKey="count" 
                   stroke="#9b87f5" 
-                  activeDot={{ r: 8 }} 
+                  activeDot={{ r: 6 }} 
                   name="Changes" 
                 />
               </LineChart>
