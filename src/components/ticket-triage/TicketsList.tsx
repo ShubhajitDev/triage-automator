@@ -76,7 +76,7 @@ const TicketsList: React.FC<TicketsListProps> = ({
   setSelectedTicket
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [editingDescription, setEditingDescription] = useState('');
   const [showChanges, setShowChanges] = useState(false);
   
@@ -85,7 +85,7 @@ const TicketsList: React.FC<TicketsListProps> = ({
       ticket.shortDescription.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ticket.id.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = !statusFilter || ticket.status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -161,7 +161,7 @@ const TicketsList: React.FC<TicketsListProps> = ({
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="New">New</SelectItem>
               <SelectItem value="Open">Open</SelectItem>
               <SelectItem value="In Progress">In Progress</SelectItem>
