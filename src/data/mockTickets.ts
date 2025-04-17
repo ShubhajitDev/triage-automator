@@ -20,8 +20,48 @@ export interface TicketChange {
   previousValue: string;
   newValue: string;
   predictedValue?: string;
+  confidence?: number;
   timestamp: string;
   appliedBy: string;
+}
+
+interface ConfusionPoint {
+  field: string;
+  originalValue: string;
+  predictedValue: string;
+  count: number;
+}
+
+interface Misclassification {
+  ticketId: string;
+  field: string;
+  originalValue: string;
+  predictedValue: string;
+}
+
+interface BeforeAfterComparison {
+  id: string;
+  ticketId: string;
+  field: string;
+  originalValue: string;
+  predictedValue: string;
+  confidence: number;
+  correct: boolean;
+  description?: string;
+  createdDate?: string;
+  status?: string;
+}
+
+interface SampleCase {
+  ticketId: string;
+  description: string;
+  field: string;
+  originalValue: string;
+  predictedValue: string;
+  confidence: number;
+  correct: boolean;
+  reasoning: string;
+  createdDate: string;
 }
 
 export const assignmentGroups = [
@@ -107,6 +147,7 @@ export const mockChanges: TicketChange[] = [
     previousValue: "Desktop Support",
     newValue: "Network Team",
     predictedValue: "Network Team",
+    confidence: 0.89,
     timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     appliedBy: "AI Triage System"
   },
@@ -117,6 +158,7 @@ export const mockChanges: TicketChange[] = [
     previousValue: "Low",
     newValue: "High",
     predictedValue: "High",
+    confidence: 0.76,
     timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
     appliedBy: "AI Triage System"
   },
@@ -127,6 +169,7 @@ export const mockChanges: TicketChange[] = [
     previousValue: "System down",
     newValue: "Database server unresponsive - critical impact",
     predictedValue: "Database server unresponsive - critical impact",
+    confidence: 0.94,
     timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
     appliedBy: "AI Triage System"
   },
@@ -137,6 +180,7 @@ export const mockChanges: TicketChange[] = [
     previousValue: "Application Support",
     newValue: "Database Team",
     predictedValue: "Database Team",
+    confidence: 0.82,
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
     appliedBy: "AI Triage System"
   },
@@ -147,7 +191,63 @@ export const mockChanges: TicketChange[] = [
     previousValue: "Medium",
     newValue: "Critical",
     predictedValue: "Critical",
+    confidence: 0.91,
     timestamp: new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString(),
+    appliedBy: "AI Triage System"
+  },
+  {
+    id: "change6",
+    ticketId: "INC100005",
+    field: "assignmentGroup",
+    previousValue: "Desktop Support",
+    newValue: "Server Team",
+    predictedValue: "Security Team",
+    confidence: 0.65,
+    timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
+    appliedBy: "AI Triage System"
+  },
+  {
+    id: "change7",
+    ticketId: "INC100006",
+    field: "shortDescription",
+    previousValue: "Can't login",
+    newValue: "Authentication failure after password reset",
+    predictedValue: "Authentication failure after password reset",
+    confidence: 0.88,
+    timestamp: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
+    appliedBy: "AI Triage System"
+  },
+  {
+    id: "change8",
+    ticketId: "INC100007",
+    field: "priority",
+    previousValue: "Low",
+    newValue: "Medium",
+    predictedValue: "Medium",
+    confidence: 0.73,
+    timestamp: new Date(Date.now() - 96 * 60 * 60 * 1000).toISOString(),
+    appliedBy: "AI Triage System"
+  },
+  {
+    id: "change9",
+    ticketId: "INC100008",
+    field: "assignmentGroup",
+    previousValue: "Network Team",
+    newValue: "Cloud Infrastructure",
+    predictedValue: "Cloud Infrastructure",
+    confidence: 0.85,
+    timestamp: new Date(Date.now() - 120 * 60 * 60 * 1000).toISOString(),
+    appliedBy: "AI Triage System"
+  },
+  {
+    id: "change10",
+    ticketId: "INC100009",
+    field: "shortDescription",
+    previousValue: "Email not working",
+    newValue: "Exchange server connectivity issues affecting email delivery",
+    predictedValue: "Exchange server connectivity issues affecting email delivery",
+    confidence: 0.92,
+    timestamp: new Date(Date.now() - 144 * 60 * 60 * 1000).toISOString(),
     appliedBy: "AI Triage System"
   }
 ];
@@ -164,6 +264,14 @@ export const getTicketStats = () => {
   const resolvedTickets = mockTickets.filter(t => t.status === 'Resolved' || t.status === 'Closed').length;
   const pendingValidation = mockTickets.filter(t => t.validationStatus === 'Pending').length;
   
+  // Count total changes
+  const changesCount = mockChanges.length;
+  
+  // Count changes where prediction matched the new value
+  const matchedChangesCount = mockChanges.filter(
+    change => change.newValue === change.predictedValue
+  ).length;
+  
   // Get changes by field
   const changesByField = mockChanges.reduce<Record<string, number>>((acc, change) => {
     if (!acc[change.field]) {
@@ -172,6 +280,30 @@ export const getTicketStats = () => {
     acc[change.field]++;
     return acc;
   }, {});
+  
+  // Calculate field accuracy
+  const fieldAccuracy = mockChanges.reduce<Record<string, number>>((acc, change) => {
+    if (!acc[change.field]) {
+      acc[change.field] = 0;
+      acc[`${change.field}_total`] = 0;
+    }
+    
+    acc[`${change.field}_total`]++;
+    
+    if (change.newValue === change.predictedValue) {
+      acc[change.field]++;
+    }
+    
+    return acc;
+  }, {});
+  
+  // Convert counts to percentages
+  const fieldAccuracyPercentages = Object.keys(fieldAccuracy)
+    .filter(key => !key.endsWith('_total'))
+    .reduce<Record<string, number>>((acc, field) => {
+      acc[field] = fieldAccuracy[field] / fieldAccuracy[`${field}_total`];
+      return acc;
+    }, {});
   
   // Get changes by date
   const now = new Date();
@@ -200,16 +332,163 @@ export const getTicketStats = () => {
     Low: mockTickets.filter(t => t.priority === 'Low').length
   };
   
+  // Generate confusion points
+  const confusionPoints: ConfusionPoint[] = [
+    {
+      field: "assignmentGroup",
+      originalValue: "Desktop Support",
+      predictedValue: "Network Team",
+      count: 5
+    },
+    {
+      field: "assignmentGroup",
+      originalValue: "Server Team",
+      predictedValue: "Cloud Infrastructure",
+      count: 3
+    },
+    {
+      field: "priority",
+      originalValue: "Low",
+      predictedValue: "Medium",
+      count: 7
+    },
+    {
+      field: "priority",
+      originalValue: "Medium",
+      predictedValue: "High",
+      count: 4
+    },
+    {
+      field: "shortDescription",
+      originalValue: "System error",
+      predictedValue: "Application crash",
+      count: 2
+    }
+  ];
+  
+  // Generate misclassification examples
+  const misclassifications: Misclassification[] = [
+    {
+      ticketId: "INC100005",
+      field: "assignmentGroup",
+      originalValue: "Desktop Support",
+      predictedValue: "Security Team"
+    },
+    {
+      ticketId: "INC100011",
+      field: "priority",
+      originalValue: "Medium",
+      predictedValue: "Low"
+    },
+    {
+      ticketId: "INC100013",
+      field: "assignmentGroup",
+      originalValue: "Application Support",
+      predictedValue: "Database Team"
+    },
+    {
+      ticketId: "INC100017",
+      field: "priority",
+      originalValue: "High",
+      predictedValue: "Critical"
+    },
+    {
+      ticketId: "INC100019",
+      field: "shortDescription",
+      originalValue: "Network issue",
+      predictedValue: "Connectivity problem"
+    }
+  ];
+  
+  // Generate before/after comparisons
+  const beforeAfterComparisons: BeforeAfterComparison[] = mockChanges.map(change => ({
+    id: change.id,
+    ticketId: change.ticketId,
+    field: change.field,
+    originalValue: change.previousValue,
+    predictedValue: change.predictedValue || '',
+    confidence: change.confidence || Math.random() * 0.5 + 0.5, // 50%-100% if not specified
+    correct: change.newValue === change.predictedValue,
+    description: mockTickets.find(t => t.id === change.ticketId)?.description,
+    createdDate: mockTickets.find(t => t.id === change.ticketId)?.createdDate,
+    status: mockTickets.find(t => t.id === change.ticketId)?.status
+  }));
+  
+  // Generate confidence buckets (0-20%, 21-40%, etc.)
+  const confidenceBuckets = [
+    mockChanges.filter(c => (c.confidence || 0) <= 0.2).length,
+    mockChanges.filter(c => (c.confidence || 0) > 0.2 && (c.confidence || 0) <= 0.4).length,
+    mockChanges.filter(c => (c.confidence || 0) > 0.4 && (c.confidence || 0) <= 0.6).length,
+    mockChanges.filter(c => (c.confidence || 0) > 0.6 && (c.confidence || 0) <= 0.8).length,
+    mockChanges.filter(c => (c.confidence || 0) > 0.8).length
+  ];
+  
+  // Generate sample cases
+  const sampleCases: SampleCase[] = [
+    {
+      ticketId: "INC100002",
+      description: "Database server unresponsive - critical impact. Users cannot access customer information system.",
+      field: "priority",
+      originalValue: "Medium",
+      predictedValue: "Critical",
+      confidence: 0.94,
+      correct: true,
+      reasoning: "ML model detected keywords 'unresponsive' and 'critical impact' suggesting high business impact. System mentioned is the customer information system which is tagged as business critical.",
+      createdDate: "2023-04-14T10:23:45Z"
+    },
+    {
+      ticketId: "INC100005",
+      description: "User unable to connect to shared drive. Local drive access working fine.",
+      field: "assignmentGroup",
+      originalValue: "Desktop Support",
+      predictedValue: "Network Team",
+      confidence: 0.87,
+      correct: true,
+      reasoning: "Shared drive access issues typically fall under Network Team responsibility. Similar tickets historically were assigned to Network Team 92% of the time.",
+      createdDate: "2023-04-15T09:17:32Z"
+    },
+    {
+      ticketId: "INC100009",
+      description: "Email delivery delayed by several hours for external recipients.",
+      field: "shortDescription",
+      originalValue: "Email not working",
+      predictedValue: "Exchange server delivery delay affecting external recipients",
+      confidence: 0.92,
+      correct: true,
+      reasoning: "Model identified specific issue (delay) and scope (external only) from description and enhanced the title to be more descriptive and actionable.",
+      createdDate: "2023-04-13T15:42:18Z"
+    },
+    {
+      ticketId: "INC100013",
+      description: "Application crashes when generating monthly reports. Error log shows database connection timeout.",
+      field: "assignmentGroup",
+      originalValue: "Application Support",
+      predictedValue: "Database Team",
+      confidence: 0.68,
+      correct: false,
+      reasoning: "Model detected 'database connection timeout' and assigned to Database Team, but the root cause was actually in the application code that wasn't handling timeouts properly.",
+      createdDate: "2023-04-11T14:33:27Z"
+    }
+  ];
+  
   return {
     totalTickets,
     openTickets,
     resolvedTickets,
     pendingValidation,
+    changesCount,
+    matchedChangesCount,
     changesByField,
+    fieldAccuracy: fieldAccuracyPercentages,
     changesByDay: Object.entries(changesByDay).map(([date, count]) => ({
       date,
       count
     })).sort((a, b) => a.date.localeCompare(b.date)),
-    ticketsByPriority
+    ticketsByPriority,
+    confusionPoints,
+    misclassifications,
+    beforeAfterComparisons,
+    confidenceBuckets,
+    sampleCases
   };
 };
